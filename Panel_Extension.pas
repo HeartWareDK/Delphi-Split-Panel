@@ -39,6 +39,24 @@ implementation
 uses
   ExtCtrls, Controls, Graphics;
 
+const
+  SplitterClass = 'TJvSplitter';
+
+type
+  TSplitterClass = class of TSplitter;
+
+function CreateSplitter(const AClassName: string; AOwner: TComponent): TSplitter;
+var
+  C: TPersistentClass;
+begin
+  C:=GetClass(AClassName);
+
+  if Assigned(C) and C.InheritsFrom(TSplitter) then
+    Result:=TSplitterClass(C).Create(AOwner)
+  else
+    Result:=TSplitter.Create(AOwner);
+end;
+
 { TPanelCustomMenuEditor }
 
 function TPanelCustomMenuEditor.GetVerbCount: Integer;
@@ -84,9 +102,11 @@ var
     result:=TPanel.Create(CurrentPanel.Owner);
     result.Name:=GetUniqueName(result);
 
-    result.Caption:='';
-    result.BevelInner:=bvNone;
-    result.BevelOuter:=bvNone;
+    Result.ShowCaption:=False;
+    //result.Caption:='';
+    //result.BevelInner:=bvNone;
+    //result.BevelOuter:=bvNone;
+    //result.BevelKind:=bkNone;
   end;
 
 var
@@ -97,6 +117,10 @@ begin
   begin
     CurrentPanel := TPanel(Component);
 
+    CurrentPanel.BevelInner:=bvNone;
+    CurrentPanel.BevelOuter:=bvNone;
+    CurrentPanel.BevelKind:=bkNone;
+
     if (Index=0) or (Index=1) then
     begin
       A:=CreatePanel;
@@ -105,7 +129,7 @@ begin
       A.Parent:=CurrentPanel;
       B.Parent:=CurrentPanel;
 
-      S:=TSplitter.Create(CurrentPanel.Owner);
+      S:=CreateSplitter(SplitterClass,CurrentPanel.Owner);
       S.Name:=GetUniqueName(S);
 
       S.Parent:=CurrentPanel;
@@ -116,7 +140,7 @@ begin
         A.Align:=alLeft;
         B.Align:=alClient;
 
-        A.Width:=CurrentPanel.Width div 2;
+        A.Width:=CurrentPanel.ClientWidth div 2;
 
         S.Align:=alLeft;
       end
@@ -125,7 +149,7 @@ begin
         A.Align:=alTop;
         B.Align:=alClient;
 
-        A.Height:=CurrentPanel.Height div 2;
+        A.Height:=CurrentPanel.ClientHeight div 2;
 
         S.Align:=alTop;
       end;
